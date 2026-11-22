@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sage: #A8B19A;
+  --color-sage-light: #C2C9B8;
+  --color-sage-dark: #8F9A7F;
+  --color-forest: #123D2C;
+  --color-forest-light: #1A523C;
+  --color-deep-green: #0C3325;
+  --color-warm-ivory: #F8F7F1;
+  --color-cream: #EFEEE5;
+  --color-cream-dark: #E4E2D5;
+  --color-champagne-gold: #B28A42;
+  --color-champagne-gold-light: #C9A45B;
+  --color-charcoal: #252A26;
+  --color-charcoal-light: #4A514B;
+  --color-white: #FFFFFF;
+
+  --font-cormorant: var(--font-cormorant);
+  --font-manrope: var(--font-manrope);
+}
+
+@utility font-cormorant {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+@utility font-manrope {
+  font-family: var(--font-manrope), system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #F8F7F1;
+    color: #252A26;
+    font-family: var(--font-manrope), system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-cormorant), Georgia, serif;
+    color: #123D2C;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-[#123D2C] text-[#F8F7F1] font-manrope font-semibold text-xs tracking-widest uppercase px-7 py-3.5 rounded-full transition-all duration-300 hover:bg-[#0C3325] hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 bg-[#B28A42] text-[#F8F7F1] font-manrope font-semibold text-xs tracking-widest uppercase px-7 py-3.5 rounded-full transition-all duration-300 hover:bg-[#967332] hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  .btn-outline-forest {
+    @apply inline-flex items-center justify-center gap-2 border border-[#123D2C] text-[#123D2C] font-manrope font-semibold text-xs tracking-widest uppercase px-7 py-3.5 rounded-full transition-all duration-300 hover:bg-[#123D2C] hover:text-[#F8F7F1] hover:shadow-md hover:-translate-y-0.5;
+  }
+
+  .btn-outline-white {
+    @apply inline-flex items-center justify-center gap-2 border border-[#F8F7F1] text-[#F8F7F1] font-manrope font-semibold text-xs tracking-widest uppercase px-7 py-3.5 rounded-full transition-all duration-300 hover:bg-[#F8F7F1] hover:text-[#123D2C] hover:shadow-md hover:-translate-y-0.5;
+  }
+
+  .section-label {
+    @apply text-[#B28A42] font-manrope text-xs tracking-[0.25em] uppercase font-bold;
+  }
+
+  .section-title {
+    @apply font-cormorant text-4xl sm:text-5xl lg:text-6xl text-[#123D2C] font-normal leading-[1.15];
+  }
+
+  .section-title-light {
+    @apply font-cormorant text-4xl sm:text-5xl lg:text-6xl text-[#F8F7F1] font-normal leading-[1.15];
+  }
+
+  .section-body {
+    @apply font-manrope text-[#4A514B] text-base md:text-lg leading-relaxed font-light;
+  }
+
+  .container-sanctuary {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #EFEEE5;
+}
+::-webkit-scrollbar-thumb {
+  background: #A8B19A;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #123D2C;
+}
