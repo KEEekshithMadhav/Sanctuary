@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 // ============================================================
 // ENQUIRY API ROUTE
-// Configure the GOOGLE_SHEETS_WEBHOOK_URL environment variable
-// to send leads to a Google Sheet via Apps Script webhook,
-// or replace this handler with your preferred CRM integration.
+// Leads are automatically forwarded to the connected Google Sheet
+// via the Google Apps Script Webhook.
 // ============================================================
+
+const GOOGLE_SHEETS_WEBHOOK_DEFAULT =
+  "https://script.google.com/macros/s/AKfycbxzyuAF7pyuFiiIU9hAVekXEJt4ToScKvoMfjTwpcub9L4pi9XCPFwcUtz81qWOU4mwQQ/exec";
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,25 +44,33 @@ export async function POST(req: NextRequest) {
       source: body.source || "Website",
     };
 
-    // Forward to Google Sheets webhook (configure in .env.local)
-    const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+    // Forward to Google Sheets webhook
+    const webhookUrl =
+      process.env.GOOGLE_SHEETS_WEBHOOK_URL || GOOGLE_SHEETS_WEBHOOK_DEFAULT;
+
     if (webhookUrl) {
-      const sheetResponse = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(leadData),
-      });
-      if (!sheetResponse.ok) {
-        console.error("Google Sheets webhook failed:", await sheetResponse.text());
-        // Don't fail the request — log and continue
+      try {
+        const sheetResponse = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(leadData),
+          redirect: "follow",
+        });
+
+        if (!sheetResponse.ok) {
+          console.error(
+            "Google Sheets webhook response not OK:",
+            sheetResponse.status,
+            await sheetResponse.text()
+          );
+        }
+      } catch (sheetErr) {
+        console.error("Google Sheets webhook forwarding error:", sheetErr);
+        // Do not fail user submission if webhook has transient network/permission issue
       }
     } else {
-      // Log to console in development (replace with your preferred logging)
       console.log("New Enquiry Lead:", leadData);
     }
-
-    // TODO: Add WhatsApp notification or email alert here
-    // TODO: Add CRM integration (e.g., Zoho, Salesforce, HubSpot)
 
     return NextResponse.json(
       {
