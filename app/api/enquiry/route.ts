@@ -20,6 +20,17 @@ import { NextRequest, NextResponse } from "next/server";
 const GOOGLE_SHEETS_WEBHOOK_DEFAULT =
   "https://script.google.com/macros/s/AKfycbxzyuAF7pyuFiiIU9hAVekXEJt4ToScKvoMfjTwpcub9L4pi9XCPFwcUtz81qWOU4mwQQ/exec";
 
+// Helper to safely clean Indian mobile numbers without stripping valid leading 91
+function cleanIndianMobile(raw: string): string {
+  let digits = raw.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) {
+    digits = digits.slice(2);
+  } else if (digits.length === 11 && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+  return digits;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -47,8 +58,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Clean Indian 10-digit mobile number
-    const mobileClean = rawMobile.replace(/\s+/g, "").replace(/^(\+91|91)/, "");
+    // Clean Indian 10-digit mobile number safely
+    const mobileClean = cleanIndianMobile(rawMobile);
     if (!/^[6-9]\d{9}$/.test(mobileClean)) {
       return NextResponse.json(
         {

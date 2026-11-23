@@ -34,8 +34,19 @@ const INITIAL_FORM: FormData = {
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
+function cleanIndianMobile(raw: string): string {
+  let digits = raw.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) {
+    digits = digits.slice(2);
+  } else if (digits.length === 11 && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+  return digits;
+}
+
 function validateIndianMobile(mobile: string): boolean {
-  return /^[6-9]\d{9}$/.test(mobile.replace(/\s+/g, "").replace(/^(\+91|91)/, ""));
+  const digits = cleanIndianMobile(mobile);
+  return /^[6-9]\d{9}$/.test(digits);
 }
 
 export default function EnquirySection() {
@@ -80,7 +91,7 @@ export default function EnquirySection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullName: form.name.trim(),
-          mobileNumber: form.mobile.trim(),
+          mobileNumber: cleanIndianMobile(form.mobile),
           emailAddress: form.email.trim(),
           preferredPlotSize: form.plotSize.trim(),
           budgetRange: form.budget.trim(),
