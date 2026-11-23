@@ -79,9 +79,10 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Prepare payload matching Google Apps Script doPost(e) JSON structure
+    // We send with +91 prefix to prevent naive Apps Script regex (^(\+91|91)) from stripping leading 91 of 10-digit numbers like 9182804545
     const appsScriptPayload = {
       fullName: rawName.trim(),
-      mobileNumber: mobileClean,
+      mobileNumber: `+91${mobileClean}`,
       emailAddress: rawEmail.trim(),
       preferredPlotSize: rawPlotSize.trim(),
       budgetRange: rawBudget.trim(),
