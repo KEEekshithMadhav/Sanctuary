@@ -79,8 +79,14 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Prepare payload matching Google Apps Script doPost(e) JSON structure
+    // Generate a unique Lead ID (e.g. SAN-1001) in case the Apps Script reads data.leadId directly
+    const generatedLeadId = `SAN-${Math.floor(1000 + Math.random() * 9000)}`;
+
     // We send with +91 prefix to prevent naive Apps Script regex (^(\+91|91)) from stripping leading 91 of 10-digit numbers like 9182804545
     const appsScriptPayload = {
+      leadId: body.leadId || generatedLeadId,
+      lead_id: body.leadId || generatedLeadId,
+      "Lead ID": body.leadId || generatedLeadId,
       fullName: rawName.trim(),
       mobileNumber: `+91${mobileClean}`,
       emailAddress: rawEmail.trim(),
