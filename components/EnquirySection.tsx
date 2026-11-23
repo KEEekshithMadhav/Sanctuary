@@ -43,6 +43,7 @@ export default function EnquirySection() {
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [submittedLeadId, setSubmittedLeadId] = useState("");
 
   const validate = (): boolean => {
     const newErrors: Partial<FormData> = {};
@@ -67,6 +68,7 @@ export default function EnquirySection() {
 
   const handleSubmit = async (e: React.FormEvent, type: "callback" | "visit") => {
     e.preventDefault();
+    if (status === "loading") return;
     if (!validate()) return;
 
     setStatus("loading");
@@ -77,20 +79,34 @@ export default function EnquirySection() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
+          fullName: form.name.trim(),
+          mobileNumber: form.mobile.trim(),
+          emailAddress: form.email.trim(),
+          preferredPlotSize: form.plotSize.trim(),
+          budgetRange: form.budget.trim(),
+          enquiryType: form.enquiryType.trim(),
+          questionsOrRequirements: form.message.trim(),
           enquirySubType: type === "visit" ? "Site Visit Booking" : "Callback Request",
           source: "Website Enquiry Desk",
-          project: "SouthPride Sanctuary",
-          timestamp: new Date().toISOString(),
         }),
       });
 
-      if (!response.ok) throw new Error("Submission failed");
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.success) {
+        throw new Error(
+          result?.error ||
+          "Could not save enquiry to Google Sheets. Please contact our desk directly via Call or WhatsApp."
+        );
+      }
+
+      setSubmittedLeadId(result.leadId || "");
       setStatus("success");
       setForm(INITIAL_FORM);
-    } catch (err) {
+    } catch (err: any) {
       setStatus("error");
       setErrorMessage(
+        err?.message ||
         "There was an error submitting your enquiry. Please reach our official lines directly via Call or WhatsApp."
       );
     }
@@ -211,6 +227,12 @@ export default function EnquirySection() {
                 <h3 className="font-cormorant text-3xl text-[#123D2C] font-semibold">
                   Enquiry Received Successfully
                 </h3>
+                {submittedLeadId && (
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFEEE5] border border-[#A8B19A]/40 text-[#123D2C] font-manrope text-xs font-semibold">
+                    <span>Lead Reference ID:</span>
+                    <span className="text-[#B28A42] font-bold tracking-wide">{submittedLeadId}</span>
+                  </div>
+                )}
                 <p className="font-manrope text-sm text-[#4A514B] max-w-md">
                   Thank you for your interest in SouthPride Sanctuary. Our dedicated sales advisor will connect with you promptly.
                 </p>
